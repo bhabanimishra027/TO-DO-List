@@ -24,5 +24,4 @@ A clean, fast, and user-friendly **To-Do List Web App** where users can create, 
 
 ---
 
-## 📂 Project Structure
 
