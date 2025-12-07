@@ -1,0 +1,89 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>My Tasks</title>
+
+  <!-- Font + Styles + JS -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/index.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <script src="{% static 'js/todo.js' %}" defer></script>
+</head>
+<body>
+  <div class="container" style="max-width:980px;">
+    <div class="header">
+      <div class="title">
+        <h1>Your Tasks</h1>
+        <p class="lead">Quickly add, edit, and complete tasks. Only you can see your tasks.</p>
+      </div>
+
+      <div style="display:flex; gap:8px; align-items:center;">
+        <a class="btn-ghost" href="{% url 'signout' %}">Logout</a>
+        <a class="btn-ghost" href="/admin/">Admin</a>
+      </div>
+    </div>
+
+    <!-- add task -->
+    <form method="post" class="task-input" style="margin-bottom:18px;">
+      {% csrf_token %}
+      <input name="title" class="form-control" placeholder="Add new task..." required autocomplete="off">
+      <button class="btn-add" type="submit">Add</button>
+    </form>
+
+    <div class="tasks">
+      <!-- main list -->
+      <div class="tasks-main">
+        {% if res %}
+          <ul class="task-list">
+            {% for t in res %}
+              <li class="task-item {% if t.status %}completed{% endif %}">
+                <div class="task-left">
+                  <!-- checkbox UI used by todo.js -->
+                  <div class="task-check {% if t.status %}checked{% endif %}" data-srno="{{ t.srno }}"></div>
+
+                  <div>
+                    <div class="task-title">{{ t.title }}</div>
+                    <div class="task-meta">Added: {{ t.date|date:"M d, Y H:i" }}</div>
+                  </div>
+                </div>
+
+                <div class="task-actions">
+                  <a class="action-btn btn-edit" href="{% url 'edit_todo' t.srno %}">Edit</a>
+                  <a class="action-btn btn-delete" href="{% url 'delete_todo' t.srno %}">Delete</a>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="empty">No tasks yet — add your first task above ✨</div>
+        {% endif %}
+      </div>
+
+      <!-- side stats -->
+      <div class="tasks-side">
+        <div class="stat">
+          <small>All</small>
+          <strong>{{ res|length }}</strong>
+        </div>
+
+        <div class="stat">
+          <small>Completed</small>
+          <!-- use completed_count provided by the view -->
+          <strong>{{ completed_count }}</strong>
+        </div>
+
+        <div style="margin-top:12px; font-size:13px; color:var(--muted);">
+          Tip: click the small square on a task to mark it completed locally. I can help make this persistent.
+        </div>
+
+        <div class="footer-links" style="margin-top:14px;">
+          <a href="#">Help</a>
+          <a href="#">Settings</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
